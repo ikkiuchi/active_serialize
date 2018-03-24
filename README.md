@@ -1,8 +1,6 @@
 # BuilderSupport
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/builder_support`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Provide a very simple way to transform ActiveRecord data into JSON output based on JBuilder.
 
 ## Installation
 
@@ -22,7 +20,58 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Suppose the table `users`:
+```ruby
+t.string :name,            null: false
+t.string :password_digest, null: false
+t.string :email
+```
+
+Model:
+```ruby
+class User
+  include BuilderSupport
+  # YES, all you have to do is write this line
+  builder_support rmv: %i[ password_digest ]
+end
+```
+
+Console:
+```
+  $ User.all.to_builder # on records (active relation)
+ => [
+        { "id" => 1, "name" => "zhandao", "email" => "xxxx" },
+        { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
+    ]
+  $ User.last.to_builder # on a record
+ => { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
+```
+
+Explain:
+
+1. Basic principle: the supporter know all the fields name through `column_names` (a db mapping func),
+    so you just have to declare which fields do not need to output by passing 'rvm' param.
+2. You can also `add` something to the output JSON, but make sure that the field name you add needs to correspond to the model instance methods.  
+    The following example will generate `{ ..., "addtion_field" => "value' }`
+    ```ruby
+    class User
+      builder_support add: :addition_field
+      
+      def addition_field
+        'value'
+      end
+    end
+    ```
+
+## Advanced Usage
+
+TODO
+
+```ruby
+builder_add :sub_categories_info, when: :get_nested_list
+builder_add :base_category_info, name: :base_category, when: -> { base_category.present? }
+builder_map a: :b
+```
 
 ## Development
 
