@@ -5,6 +5,7 @@ RSpec.describe ActiveSerialize do
   describe '#to_h' do
     context 'normally' do
       it { expect(User.first.to_h.keys).to eq %w[ id name created_at updated_at ] }
+      it { expect(User.first.to_h(rmv: [:created_at], add: :love).keys).to eq %w[ id name updated_at love ] }
     end
 
     context 'when removing some attributes' do

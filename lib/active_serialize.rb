@@ -15,9 +15,9 @@ module ActiveSerialize
       include  ToH
       delegate :active_serialize_keys, :_active_serialize, to: self
 
-      active_serialize_rmv *rmv
-      active_serialize_add *add
-      active_serialize_add *recursive, recursive: true
+      active_serialize_rmv *Array(rmv)
+      active_serialize_add *Array(add)
+      active_serialize_add *Array(recursive), recursive: true
     end
   end
 

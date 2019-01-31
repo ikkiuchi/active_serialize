@@ -19,13 +19,13 @@ module ActiveSerialize
       _active_serialize[recursive ? :recursive : :add].concat attrs.map(&:to_sym)
     end
 
-    def active_serialize_map settings = { }
+    def active_serialize_map **settings
       _active_serialize[:map].merge! settings
     end
 
     def active_serialize_keys(rmv: [ ], add: [ ])
       _active_serialize[:final] ||= column_names.map(&:to_sym) - _active_serialize[:rmv] + _active_serialize[:add]
-      _active_serialize[:final] - rmv + add
+      _active_serialize[:final] - Array(rmv) + Array(add)
     end
   end
 end

@@ -1,6 +1,6 @@
 # ActiveSerialize
 
-Provide a very simple way to transform ActiveRecord data into Hash output.
+Provide a very simple way to transform ActiveRecord data into Hash.
 
 ## Installation
 
@@ -18,59 +18,100 @@ Or install it yourself as:
 
     $ gem install active_serialize
 
-## Usage
+## Basic Usage
 
-Suppose the table `users`:
+There is a table `users`:
 ```ruby
-t.string :name,            null: false
-t.string :password_digest, null: false
+t.string :name
 t.string :email
 ```
 
-Model:
+And a table `books`:
+
 ```ruby
-class User
-  # YES, all you have to do is write this line
-  active_serialize rmv: %i[ password_digest ]
+t.bigint :user_id
+t.string :name
+```
+
+Declaration in model:
+```ruby
+class User < ActiveRecord::Base
+  active_serialize
+  has_many :books
+  
+  def love
+    'Ruby'
+  end
+end
+
+class Book < ActiveRecord::Base
+  active_serialize rmv: :user_id
+  belongs_to :user
 end
 ```
 
-Console:
-```
-  $ User.all.to_h # on records (active relation)
- => [
-        { "id" => 1, "name" => "zhandao", "email" => "xxxx" },
-        { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
-    ]
-  $ User.last.to_h # on a record
- => { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
+Then:
+```ruby
+User.last.to_h
+# => { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
+
+User.where(id: [1, 2]).to_ha # means "to hash array"
+# => [
+#        { "id" => 1, "name" => "zhandao", "email" => "xxxx" },
+#        { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
+#    ]
 ```
 
-Explain:
+The basic usage just looks like `attributes` method.
 
-1. Basic principle: the supporter know all the fields name through `column_names` (a db mapping func),
-    so you just have to declare which fields do not need to output by passing 'rvm' param.
-2. You can also `add` something to the output JSON, but make sure that the field name you add needs to correspond to the model instance methods.  
-    The following example will generate `{ ..., "addtion_field" => "value' }`
-    ```ruby
-    class User
-      active_serialize add: :addition_field
-      
-      def addition_field
-        'value'
-      end
-    end
-    ```
+## How is it work?
+
+ActiveRecord class method `column_names` (which is called by this gem) shows that the filed names by loading database schema.
 
 ## Advanced Usage
 
-TODO
+### Except (remove) keys
 
+1. remove by default: `active_serialize rmv: [:email]` (you can also use `active_serialize_rmv`)
+2. remove when calling `to_h`: `to_h(rmv: [:email])`
+
+`=> { "id" => 2, "name" => "ikkiuchi" }`
+
+### Add keys
+
+1. add it by default: `active_serialize add: [:love]` (you can also use `active_serialize_add`)
+2. add when calling `to_h`: `to_h(add: [:love])`
+
+`=> { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx", "love" => "Ruby" }`
+
+* Values of addition keys will be the result of calling `public_send`
+
+### Add recursive attributes
+
+* recursive? —— calls `to_h` recursively (/ nested)
+
+See below:
 ```ruby
-active_serialize_add :sub_categories_info, when: :get_nested_list
-active_serialize_add :base_category_info, name: :base_category, when: -> { base_category.present? }
-active_serialize_map a: :b
+User.first.books.to_ha
+# => [{ "name" => "Rails Guide" }]
+
+# declaration in User
+active_serialize_add :books, recursive: true
+# `active_serialize recursive: :books` is OK, but notice `active_serialize` should only be called once.
+
+# then ...
+User.first.to_h
+# => { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx", "books" => [{ "name" => "Rails Guide" }] }
 ```
+
+### Transform key names
+
+Choose one of the following ways:
+
+1. `active_serialize_map love: :looove`
+2. `active_serialize_add :love, named: :looove`
+
+`=> { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx", "looove" => "Ruby" }`
 
 ## Development
 
