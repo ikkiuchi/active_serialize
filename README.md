@@ -1,13 +1,13 @@
-# BuilderSupport
+# ActiveSerialize
 
-Provide a very simple way to transform ActiveRecord data into JSON output based on JBuilder.
+Provide a very simple way to transform ActiveRecord data into Hash output.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'builder_support'
+gem 'active_serialize'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install builder_support
+    $ gem install active_serialize
 
 ## Usage
 
@@ -30,20 +30,19 @@ t.string :email
 Model:
 ```ruby
 class User
-  include BuilderSupport
   # YES, all you have to do is write this line
-  builder_support rmv: %i[ password_digest ]
+  active_serialize rmv: %i[ password_digest ]
 end
 ```
 
 Console:
 ```
-  $ User.all.to_builder # on records (active relation)
+  $ User.all.to_h # on records (active relation)
  => [
         { "id" => 1, "name" => "zhandao", "email" => "xxxx" },
         { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
     ]
-  $ User.last.to_builder # on a record
+  $ User.last.to_h # on a record
  => { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx" }
 ```
 
@@ -55,7 +54,7 @@ Explain:
     The following example will generate `{ ..., "addtion_field" => "value' }`
     ```ruby
     class User
-      builder_support add: :addition_field
+      active_serialize add: :addition_field
       
       def addition_field
         'value'
@@ -68,9 +67,9 @@ Explain:
 TODO
 
 ```ruby
-builder_add :sub_categories_info, when: :get_nested_list
-builder_add :base_category_info, name: :base_category, when: -> { base_category.present? }
-builder_map a: :b
+active_serialize_add :sub_categories_info, when: :get_nested_list
+active_serialize_add :base_category_info, name: :base_category, when: -> { base_category.present? }
+active_serialize_map a: :b
 ```
 
 ## Development
@@ -81,7 +80,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/builder_support. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ikkiuchi/active_serialize. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -89,4 +88,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the BuilderSupport project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/builder_support/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the ActiveSerialize project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/ikkiuchi/active_serialize/blob/master/CODE_OF_CONDUCT.md).
