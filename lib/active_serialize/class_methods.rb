@@ -7,7 +7,7 @@ module ActiveSerialize
     end
 
     def to_ha(**args)
-      find_each.map { |record| record.to_h(**args) }
+      all.to_a.map { |record| record.to_h(**args) }
     end
 
     def active_serialize_rmv *attrs
