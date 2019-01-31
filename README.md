@@ -86,6 +86,10 @@ ActiveRecord class method `column_names` (which is called by this gem) shows tha
 
 * Values of addition keys will be the result of calling `public_send`
 
+### Set default exception and addition keys
+
+Using `active_serialize_default rmv: [ ], add: [ ]`
+
 ### Add recursive attributes
 
 * recursive? —— calls `to_h` recursively (/ nested)

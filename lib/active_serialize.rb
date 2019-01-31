@@ -7,7 +7,7 @@ require 'active_serialize/class_methods'
 
 module ActiveSerialize
   extend ActiveSupport::Concern
-  cattr_accessor :configs, default: { }
+  cattr_accessor :configs, default: { default: { rmv: [ ], add: [ ] } }
 
   class_methods do
     def active_serialize rmv: [ ], add: [ ], recursive: [ ]
@@ -18,6 +18,10 @@ module ActiveSerialize
       active_serialize_rmv *Array(rmv)
       active_serialize_add *Array(add)
       active_serialize_add *Array(recursive), recursive: true
+    end
+
+    def active_serialize_default **args
+      ActiveSerialize.configs[:default].merge!(args)
     end
   end
 

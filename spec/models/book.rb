@@ -1,5 +1,6 @@
 class Book < ActiveRecord::Base
-  active_serialize rmv: [:id, :user_id]
+  active_serialize_default rmv: [:id]
+  active_serialize rmv: [:user_id]
 
   belongs_to :user
 end

@@ -3,7 +3,7 @@
 module ActiveSerialize
   module ClassMethods
     def _active_serialize
-      ActiveSerialize.configs[name] ||= { rmv: [ ], add: [ ], final: nil, recursive: [ ], map: { } }
+      ActiveSerialize.configs[name] ||= { **ActiveSerialize.configs[:default].deep_dup, final: nil, recursive: [ ], map: { } }
     end
 
     def to_ha(**args)
