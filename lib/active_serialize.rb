@@ -33,6 +33,8 @@ module ActiveSerialize
           .map{ |key| [ tran_key.(key), public_send(key) ] }.to_h
           .merge(merge).merge(recursion)
     end
+
+    alias to_ha to_h
   end
 end
 
