@@ -117,6 +117,13 @@ Choose one of the following ways:
 
 `=> { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx", "looove" => "Ruby" }`
 
+### Transform key format
+
+1. set as default: `active_serialize_default key_format: ...`
+2. only effect for a model: `active_serialize key_format: ...`
+
+Optional value: `underscore / camelize / camelize_lower`
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

@@ -32,6 +32,12 @@ RSpec.describe ActiveSerialize do
         it { expect(User.first.to_h.keys).to eq %w[ name created_at updated_at love method_b ] }
       end
     end
+
+    context 'key transformation' do
+      before { User.active_serialize; ActiveSerialize.configs['User'][:key_format] = :camelize_lower }
+      it { expect(User.first.to_h.keys).to eq %w[ name createdAt updatedAt ] }
+      after { ActiveSerialize.configs['User'][:key_format] = nil }
+    end
   end
 
   describe 'Class Method .to_ha' do
