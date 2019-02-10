@@ -28,11 +28,11 @@ module ActiveSerialize
   end
 
   module ToH
-    def to_h(rmv: [ ], add: [ ], merge: { })
+    def to_h(*groups, rmv: [ ], add: [ ], merge: { })
       tran_key = ->(key) { _active_serialize[:map][key] || key }
       recursion = _active_serialize[:recursive].map { |key| [ tran_key.(key), public_send(key)&.to_ha ] }.to_h
       KeyFormatter.(_active_serialize[:key_format],
-          active_serialize_keys(rmv: rmv, add: add)
+          active_serialize_keys(*groups, rmv: rmv, add: add)
               .map { |key| [ tran_key.(key), public_send(key) ] }.to_h
               .merge(merge).merge(recursion).deep_stringify_keys!
       )

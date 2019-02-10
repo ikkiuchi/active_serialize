@@ -108,6 +108,18 @@ User.first.to_h
 # => { "id" => 2, "name" => "ikkiuchi", "email" => "xxxx", "books" => [{ "name" => "Rails Guide" }] }
 ```
 
+### Add attributes only when passing the specified `group` key
+
+Like the example below:
+
+```ruby
+User.active_serialize_add :love, group: :abcd
+# Then:
+User.first.to_h.keys.include?('love') # => false
+User.first.to_h(:abcd).keys.include('love') # => true
+```
+
+
 ### Transform key names
 
 Choose one of the following ways:

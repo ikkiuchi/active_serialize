@@ -31,6 +31,12 @@ RSpec.describe ActiveSerialize do
         before { User.active_serialize_add :method_a, named: :method_b }
         it { expect(User.first.to_h.keys).to eq %w[ name created_at updated_at love method_b ] }
       end
+
+      context 'into group' do
+        before { User.active_serialize_add :method_a, group: :info }
+        it { expect(User.first.to_h.keys).to eq %w[ name created_at updated_at love ] }
+        it { expect(User.first.to_h(:info).keys).to eq %w[ name created_at updated_at love method_a ] }
+      end
     end
 
     context 'key transformation' do
