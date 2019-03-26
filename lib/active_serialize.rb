@@ -33,7 +33,7 @@ module ActiveSerialize
   module ToH
     def to_h(*groups, rmv: [ ], add: [ ], recursive: [ ], plucked: { }, merge: { })
       tran_key  = ->(key) { _active_serialize[:map][key] || key }
-      recursion = (_active_serialize[:recursive] + recursive).map { |k| [ k, public_send(k)&.to_ha ] }.to_h
+      recursion = (_active_serialize[:recursive] + recursive).map { |k| [ k, public_send(k)&.to_ha(*groups) ] }.to_h
 
       KeyFormatter.(_active_serialize[:key_format],
           active_serialize_keys(*groups, rmv: rmv, add: add)
