@@ -31,13 +31,19 @@ module ActiveSerialize
   end
 
   module ToH
-    def to_h(*groups, rmv: [ ], add: [ ], flat_add: [ ], recursive: [ ], plucked: { }, merge: { })
+    def to_h(*groups, rmv: [ ], add: [ ], flat_add: [ ], recursive: [ ], plucked: { }, merge: { }, **opts)
       recursion = (_active_serialize[:recursive] + recursive).map { |k| [ k, public_send(k)&.to_ha(*groups) ] }.to_h
       merge.merge!(flat_add.map(&method(:public_send)).reduce({ }, :merge)) if flat_add.present?
+      keys = active_serialize_keys(*groups, rmv: rmv, add: add, **opts)
+      if keys.is_a?(Hash) && instance_exec(&keys[:if].first)
+        keys = keys[:if].last[:only] ||
+            keys[:normal] + (keys[:if].last[:add] || [ ]) - (keys[:if].last[:rmv] || [ ])
+      else
+        keys = keys[:normal]
+      end
 
       KeyFormatter.(_active_serialize[:key_format],
-          active_serialize_keys(*groups, rmv: rmv, add: add)
-              .map { |key| [ key, public_send(key) ] }.to_h
+          keys.map { |key| [ key, public_send(key) ] }.to_h
               .merge(plucked).merge(recursion).merge(merge)
               .transform_keys { |key| _active_serialize[:map][key] || key }
               .deep_stringify_keys!

@@ -28,10 +28,12 @@ module ActiveSerialize
       _active_serialize[:map].merge! settings
     end
 
-    def active_serialize_keys(*groups, rmv: [ ], add: [ ])
+    def active_serialize_keys(*groups, rmv: [ ], add: [ ], only: nil, **opts)
+      return only if only
       _active_serialize[:final] ||= column_names.map(&:to_sym) - _active_serialize[:rmv] + _active_serialize[:add]
-      _active_serialize[:final] - Array(rmv) + Array(add) +
+      result = _active_serialize[:final] - Array(rmv) + Array(add) +
           _active_serialize[:groups].values_at(*groups).flatten.compact.uniq
+      opts[:if] ? { normal: result, if: opts[:if] } : result
     end
   end
 end
