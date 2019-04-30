@@ -35,12 +35,10 @@ module ActiveSerialize
       recursion = (_active_serialize[:recursive] + recursive).map { |k| [ k, public_send(k)&.to_ha(*groups) ] }.to_h
       merge.merge!(flat_add.map(&method(:public_send)).reduce({ }, :merge)) if flat_add.present?
       keys = active_serialize_keys(*groups, rmv: rmv, add: add, **opts)
-      if keys.is_a?(Hash) && instance_exec(&keys[:if].first)
-        keys = keys[:if].last[:only] ||
-            keys[:normal] + (keys[:if].last[:add] || [ ]) - (keys[:if].last[:rmv] || [ ])
-      else
-        keys = keys[:normal]
-      end
+      instance_exec(&keys[:if].first) \
+          ? keys[:if].last[:only] || keys[:normal] + (keys[:if].last[:add] || [ ]) - (keys[:if].last[:rmv] || [ ])
+          : keys[:normal] \
+          if keys.is_a?(Hash)
 
       KeyFormatter.(_active_serialize[:key_format],
           keys.map { |key| [ key, public_send(key) ] }.to_h
